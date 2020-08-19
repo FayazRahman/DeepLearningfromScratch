@@ -64,3 +64,19 @@ class Conv2D:
 			for f in range(self.num_filters):
 				output[i, j, f] = np.sum(im_region * self.filters[f])
 		return output
+	
+	def backprop(self, dl_dout, alpha):
+		dl_dfilters = np.zeros(self.filters.shape)
+		dl_dinputs = np.zeros(self.inpt.shape)
+
+		for i, j, im_region in self.iterate_regions(self.inpt):
+			for k in np.arange(self.num_filters):
+				dl_dfilters[k] += dl_dout[i, j, k] * im_region
+
+		for i, j, im_region in self.iterate_regions(dl_dinputs):
+			for k in np.arange(self.num_filters):
+				dl_dinputs[i : i + self.f_h, j : j + self.f_w] += dl_dout[i, j, k] * self.filters[k]
+		
+		self.filters += -alpha * dl_dfilters
+		
+		return dl_dinputs

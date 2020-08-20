@@ -1,1 +1,1 @@
-"Python implementations of deep learning methods from scratch." 
+Python implementations of deep learning methods from scratch.

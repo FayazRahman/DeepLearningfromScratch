@@ -1,3 +1,5 @@
+import numpy as np
+
 class Softmax:
 	def __init__(self, input_len, nodes):
 		self.input_len = input_len

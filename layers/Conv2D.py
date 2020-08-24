@@ -1,7 +1,8 @@
 import numpy as np
 
 class Conv2D:
-	def __init__(self, num_filters, filter_shape, strides=1, padding="same"):
+	def __init__(self, num_filters, filter_shape, activation=None, strides=1, padding="same"):
+		self.activation = activation
 		self.num_filters = num_filters
 		self.f_h = filter_shape[0]
 		self.f_w = filter_shape[1]
@@ -63,11 +64,19 @@ class Conv2D:
 		for i, j, im_region in self.iterate_regions(inpt):
 			for f in range(self.num_filters):
 				output[i, j, f] = np.sum(im_region * self.filters[f])
+		
+		if self.activation:
+			output = self.activation.fn(output)
+		
+		self.output = output
 		return output
 	
 	def backprop(self, dl_dout, alpha):
 		dl_dfilters = np.zeros(self.filters.shape)
 		dl_dinputs = np.zeros(self.inpt.shape)
+
+		if self.activation:
+			dl_dout = dl_dout * self.activation.derivative(self.output)
 
 		for i, j, im_region in self.iterate_regions(self.inpt):
 			for k in np.arange(self.num_filters):
